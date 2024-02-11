@@ -4,6 +4,7 @@ from PIL import Image
 
 def index_image_with_ref(image_path, ref_image_path):
     
+    # from https://stackoverflow.com/questions/29433243/convert-image-to-specific-palette-using-pil-without-dithering
     # get palette from ref image
     oldimage = Image.open(ref_image_path)
     pal = oldimage.getpalette()
