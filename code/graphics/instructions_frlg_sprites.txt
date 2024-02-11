@@ -1,0 +1,39 @@
+## Instructions for swapping the vanilla Emerald sprites of the kanto mons for the FRLG sprites:
+1. stub out the function(s) at src/decompress.c#L449 : stub out gMonFrontPicTableFRLG , gMonFrontPicTableDP, or rather their contents. e.g.:
+     ```
+     static void SwapSprite(u16 species, u32 pid, void *dest)
+     {
+     }
+     ```
+2. These contain pointers to alternate sprites, so if I'm going to swap graphics/pokemon as a whole, they'll all be broken. If I just do a drag-and-drop overwrite keeping the extra sprites there and just stub the function, it should work fine
+3. Clean clone
+4. Merge/overwrite the contents of graphics/pokemon using mine.
+5. make mostlyclean; make
+
+## Fix the following mons:
+ - Seaking (missing the second frame) DONE
+ - Poliwag
+ - Poliwhirl
+ - ((I know there are more; check the pokedex))
+
+## Fix icons:
+ - Grovyle
+ - Torkoal
+ - Cradily
+ - Iglybuf
+ - Bagon
+ - Xatu
+ - Foretress?
+ - they share palettes, check the ones sharing the same palettes as the faulty ones
+
+## Custom sprites:
+ - Scyther (merged the FRLG with the RSE one. Needs a bit of polishing)
+ - Pikachu
+ - LUGIA
+
+## Sprites Im considering changing
+ - Latios: Lighten up the gray colours (did a mockup a while ago) DONE
+ - Smeargle: Looks a bit disturbing. Adjust the colours a bit maybe. Plus, maybe the HG/SS one?
+ - Furret: Revamp of the GSC sprite. Or, change the backsprite for the backsprite in HG/SS
+ - Tropius Backsprite DONE
+ - Regis look tiny in the sprites
