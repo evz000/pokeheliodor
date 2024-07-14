@@ -79,7 +79,7 @@
 
 // Used in cases where division by 0 can occur in the retail version.
 // Avoids invalid opcodes on some emulators, and the otherwise UB.
-#define SAFE_DIV(a, b) ((b) ? (a) / (b) : 0)
+#define SAFE_DIV(a, b) (((b) != 0) ? (a) / (b) : 0)
 
 // The below macro does a%n, but (to match) will switch to a&(n-1) if n is a power of 2.
 // There are cases where GF does a&(n-1) where we would really like to have a%n, because
@@ -1087,7 +1087,8 @@ struct SaveBlock1
 	           u32 trainerCardStat4:4;
 	           u32 filler:12;
     /*0x3670*/ u16 rubySapphireSecretId;
-    /*0x3672*/ u8 mainUnused[0xA6];
+    /*0x3672*/ u32 savedFrontierExp[FRONTIER_PARTY_SIZE];
+    /*0x3682*/ u8 mainUnused[0x96];
     /*0x3718*/ u32 trainerHillTimes[NUM_TRAINER_HILL_MODES];
     /*0x3728*/ struct RamScript ramScript;
     /*0x3B14*/ struct RecordMixingGift recordMixingGift;
