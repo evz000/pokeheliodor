@@ -485,7 +485,7 @@ static void RemoveExtraStartMenuWindows(void)
         ClearStdWindowAndFrameToTransparent(sBattlePyramidFloorWindowId, FALSE);
         RemoveWindow(sBattlePyramidFloorWindowId);
     }
-	if (FlagGet(FLAG_SYS_CLOCK_SET))
+	if (FlagGet(FLAG_TEMP_5))
 	{
 		ClearStdWindowAndFrameToTransparent(sCurrentTimeWindowId, FALSE);
         CopyWindowToVram(sCurrentTimeWindowId, 2);
@@ -698,9 +698,17 @@ static bool8 HandleStartMenuInput(void)
 
 	if (JOY_NEW(R_BUTTON))
 	{
-		PlaySE(SE_SELECT);
-		gMenuCallback = StartMenuSaveCallback;
-		return FALSE;
+        if (!IsOverworldLinkActive()
+         && !InUnionRoom()
+         && !GetSafariZoneFlag()
+         && !InBattlePike()
+         && !InBattlePyramid()
+         && !InMultiPartnerRoom())
+        {
+            PlaySE(SE_SELECT);
+            gMenuCallback = StartMenuSaveCallback;
+            return FALSE;
+        }
 	}
 
     return FALSE;
@@ -794,6 +802,8 @@ static bool8 StartMenuSaveCallback(void)
         RemoveExtraStartMenuWindows();
 	if (FlagGet(FLAG_TEMP_6))
 		ClearDialogWindowAndFrameToTransparent(sCurrentPowerWindowId, FALSE);
+    if (FlagGet(FLAG_TEMP_5))
+		ClearDialogWindowAndFrameToTransparent(sCurrentTimeWindowId, FALSE);
 
     gMenuCallback = SaveStartCallback; // Display save menu
 
