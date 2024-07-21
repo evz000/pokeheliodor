@@ -453,8 +453,6 @@ static void DuplicateDeoxysTiles(void *pointer, s32 species)
 
 static void SwapSprite(u16 species, u32 pid, void *dest)
 {
-<<<<<<< HEAD
-=======
     //u8 value = (pid >> 24) & 7;
     //
     //if (value == 1 && gSpeciesInfo[species].hasFRLGSprite)
@@ -467,5 +465,4 @@ static void SwapSprite(u16 species, u32 pid, void *dest)
     //    LZ77UnCompWram(gMonFrontPicTableBW[species].data, dest);
     //else
     //    return;
->>>>>>> citrusheliodor/master
 }
