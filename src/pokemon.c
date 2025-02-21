@@ -2369,7 +2369,7 @@ const u16 sSafariZoneLeafGreen[] =
 	SPECIES_REMORAID
 };
 
-const u16 sSafariZoneFireRedLeafGreen[] = 
+const u16 sSafariZoneFireRedLeafGreen[] =
 {
 	SPECIES_PIKACHU,
 	SPECIES_DODUO,
@@ -2458,14 +2458,14 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
 	u32 shinyValue;
     bool32 otIdOverride = FALSE;
 	u16 rolls = 1;
-	
+
 	if (HasAllMons())
 		rolls += SHINY_CHARM_REROLLS;
 	if (species == gLastEncounteredSpecies)
 		rolls += gChainStreak;
 	if (gPowerType == POWER_LUCKY && gPowerLevel == 3 && gPowerTime > 0)
 		rolls *= 2;
-	
+
 	metLocation = GetCurrentRegionMapSectionId();
 
 	gDisableVBlankRNGAdvance = TRUE;
@@ -2697,7 +2697,7 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
 				{
 					personality = Random32();
 				}
-				
+
 				shinyValue = HIHALF(*gSaveBlock2Ptr->playerTrainerId) ^ LOHALF(*gSaveBlock2Ptr->playerTrainerId) ^ HIHALF(personality) ^ LOHALF(personality);
 				if (shinyValue < SHINY_ODDS)
 					break;
@@ -2745,7 +2745,7 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
 				{
 					personality = Random32();
 				}
-				
+
 				shinyValue = HIHALF(*gSaveBlock2Ptr->playerTrainerId) ^ LOHALF(*gSaveBlock2Ptr->playerTrainerId) ^ HIHALF(personality) ^ LOHALF(personality);
 				if (shinyValue < SHINY_ODDS)
 					break;
@@ -2767,7 +2767,7 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
               | (gSaveBlock2Ptr->playerTrainerId[2] << 16)
               | (gSaveBlock2Ptr->playerTrainerId[3] << 24);
 		language = gGameLanguage;
-		
+
 		if (IsMonSapphireExclusive(species))
 		{
 			version = VERSION_SAPPHIRE;
@@ -2808,7 +2808,7 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
 		{
 			version = gGameVersion;
 		}
-		
+
 		if (metLocation != MAPSEC_SAFARI_ZONE)
 		{
 			if (IsMonOutsideSafariFireRed(species))
@@ -2937,14 +2937,14 @@ void CreateMonWithNature(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV,
 	u32 shinyValue;
 	u16 i = 0;
 	u16 rolls = 1;
-	
+
 	if (HasAllMons())
 		rolls += SHINY_CHARM_REROLLS;
 	if (species == gLastEncounteredSpecies)
 		rolls += gChainStreak;
 	if (gPowerType == POWER_LUCKY && gPowerLevel == 3 && gPowerTime > 0)
 		rolls *= 2;
-	
+
 	do
 	{
 		do
@@ -2970,7 +2970,7 @@ void CreateMonWithGenderNatureLetter(struct Pokemon *mon, u16 species, u8 level,
 	u32 shinyValue;
 	u16 i = 0;
 	u16 rolls = 1;
-	
+
 	if (HasAllMons())
 		rolls += SHINY_CHARM_REROLLS;
 	if (species == gLastEncounteredSpecies)
@@ -3686,6 +3686,7 @@ u16 MonTryLearningNewMove(struct Pokemon *mon, bool8 firstMove)
     u32 retVal = MOVE_NONE;
     u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
     u8 level = GetMonData(mon, MON_DATA_LEVEL, NULL);
+    bool32 wasBaby = GetMonData(mon, MON_DATA_MET_LEVEL, NULL) == 0;
 
     // since you can learn more than one move per level
     // the game needs to know whether you decided to
@@ -3697,6 +3698,9 @@ u16 MonTryLearningNewMove(struct Pokemon *mon, bool8 firstMove)
 
         while ((gLevelUpLearnsets[species][sLearningMoveTableID] & LEVEL_UP_MOVE_LV) != (level << 9))
         {
+            if ((gLevelUpLearnsets[species][sLearningMoveTableID] & LEVEL_UP_MOVE_BABY) && !wasBaby)
+                continue;
+
             sLearningMoveTableID++;
             if (gLevelUpLearnsets[species][sLearningMoveTableID] == LEVEL_UP_END)
                 return MOVE_NONE;
@@ -3705,6 +3709,9 @@ u16 MonTryLearningNewMove(struct Pokemon *mon, bool8 firstMove)
 
     if ((gLevelUpLearnsets[species][sLearningMoveTableID] & LEVEL_UP_MOVE_LV) == (level << 9))
     {
+        if ((gLevelUpLearnsets[species][sLearningMoveTableID] & LEVEL_UP_MOVE_BABY) && !wasBaby)
+            return retVal;
+
         gMoveToLearn = (gLevelUpLearnsets[species][sLearningMoveTableID] & LEVEL_UP_MOVE_ID);
         sLearningMoveTableID++;
         retVal = GiveMoveToMon(mon, gMoveToLearn);
@@ -5133,9 +5140,9 @@ u8 GiveMonToPlayer(struct Pokemon *mon)
 	u8 otGender;
 	u32 otId;
 	u16 species;
-	
+
 	species = GetMonData(mon, MON_DATA_SPECIES, NULL);
-	
+
 	if (species == SPECIES_MEW)
 	{
 		otName[0] = gSaveBlock2Ptr->playerName[0];
@@ -5145,7 +5152,7 @@ u8 GiveMonToPlayer(struct Pokemon *mon)
 		otName[4] = gSaveBlock2Ptr->playerName[4];
 		otName[5] = 0xFF;
 		otName[6] = gSaveBlock2Ptr->playerName[5];
-		otName[7] = gSaveBlock2Ptr->playerName[6]; 
+		otName[7] = gSaveBlock2Ptr->playerName[6];
 		otGender = gSaveBlock2Ptr->playerGender;
 		otId = gSaveBlock2Ptr->playerTrainerId[0]
               | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
@@ -5183,7 +5190,7 @@ u8 GiveMonToPlayer(struct Pokemon *mon)
 		otName[4] = gSaveBlock2Ptr->playerName[4];
 		otName[5] = gSaveBlock2Ptr->playerName[5];
 		otName[6] = gSaveBlock2Ptr->playerName[6];
-		otName[7] = gSaveBlock2Ptr->playerName[7]; 
+		otName[7] = gSaveBlock2Ptr->playerName[7];
 		otGender = gSaveBlock2Ptr->playerGender;
 		otId = gSaveBlock2Ptr->playerTrainerId[0]
               | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
@@ -5470,8 +5477,8 @@ void CopyPlayerPartyMonToBattleData(u8 battlerId, u8 partyIndex)
     gBattleMons[battlerId].isEgg = GetMonData(&gPlayerParty[partyIndex], MON_DATA_IS_EGG, NULL);
     gBattleMons[battlerId].abilityNum = GetMonData(&gPlayerParty[partyIndex], MON_DATA_ABILITY_NUM, NULL);
     gBattleMons[battlerId].otId = GetMonData(&gPlayerParty[partyIndex], MON_DATA_OT_ID, NULL);
-    gBattleMons[battlerId].type1 = gSpeciesInfo[gBattleMons[battlerId].species].types[0];
-    gBattleMons[battlerId].type2 = gSpeciesInfo[gBattleMons[battlerId].species].types[1];
+    gBattleMons[battlerId].types[0] = gSpeciesInfo[gBattleMons[battlerId].species].types[0];
+    gBattleMons[battlerId].types[1] = gSpeciesInfo[gBattleMons[battlerId].species].types[1];
     gBattleMons[battlerId].ability = GetAbilityBySpecies(gBattleMons[battlerId].species, gBattleMons[battlerId].abilityNum);
     GetMonData(&gPlayerParty[partyIndex], MON_DATA_NICKNAME, nickname);
     StringCopy_Nickname(gBattleMons[battlerId].nickname, nickname);
@@ -6499,7 +6506,7 @@ u16 SpeciesToCryId(u16 species)
 // To draw a spot pixel, add 4 to the color index
 #define SPOT_COLOR_ADJUSTMENT 4
 /*
-    The macro below handles drawing the randomly-placed spots on Spinda's front sprite.
+    The macros below handle drawing the randomly-placed spots on Spinda's front sprite.
     Spinda has 4 spots, each with an entry in gSpindaSpotGraphics. Each entry contains
     a base x and y coordinate for the spot and a 16x16 binary image. Each bit in the image
     determines whether that pixel should be considered part of the spot.
@@ -6511,18 +6518,26 @@ u16 SpeciesToCryId(u16 species)
     coordinate is calculated as (baseCoord + (given 4 bits of personality) - 8). In effect this
     means each spot can start at any position -8 to +7 off of its base coordinates (256 possibilities).
 
-    The macro then loops over the 16x16 spot image. For each bit in the spot's binary image, if
+    DRAW_SPINDA_SPOTS loops over the 16x16 spot image. For each bit in the spot's binary image, if
     the bit is set then it's part of the spot; try to draw it. A pixel is drawn on Spinda if the
-    pixel on Spinda satisfies the following formula: ((u8)(colorIndex - 1) <= 2). The -1 excludes
-    transparent pixels, as these are index 0. Therefore only colors 1, 2, or 3 on Spinda will
-    allow a spot to be drawn. These color indexes are Spinda's light brown body colors. To create
+    pixel is between FIRST_SPOT_COLOR and LAST_SPOT_COLOR (so only colors 1, 2, or 3 on Spinda will
+    allow a spot to be drawn). These color indexes are Spinda's light brown body colors. To create
     the spot it adds 4 to the color index, so Spinda's spots will be colors 5, 6, and 7.
 
-    The above is done two different ways in the macro: one with << 4, and one without. This
-    is because Spinda's sprite is a 4 bits per pixel image, but the pointer to Spinda's pixels
+    The above is done in TRY_DRAW_SPOT_PIXEL two different ways: one with << 4, and one without.
+    This is because Spinda's sprite is a 4 bits per pixel image, but the pointer to Spinda's pixels
     (destPixels) is an 8 bit pointer, so it addresses two pixels. Shifting by 4 accesses the 2nd
     of these pixels, so this is done every other time.
 */
+
+// Draw spot pixel if this is Spinda's body color
+#define TRY_DRAW_SPOT_PIXEL(pixels, shift) \
+    if (((*(pixels) & (0xF << (shift))) >= (FIRST_SPOT_COLOR << (shift))) \
+     && ((*(pixels) & (0xF << (shift))) <= (LAST_SPOT_COLOR << (shift)))) \
+    { \
+        *(pixels) += (SPOT_COLOR_ADJUSTMENT << (shift)); \
+    }
+
 #define DRAW_SPINDA_SPOTS(personality, dest)                                    \
 {                                                                               \
     s32 i;                                                                      \
@@ -6552,17 +6567,11 @@ u16 SpeciesToCryId(u16 species)
                     /* of the two pixels is being considered for drawing */     \
                     if (column & 1)                                             \
                     {                                                           \
-                        /* Draw spot pixel if this is Spinda's body color */    \
-                        if ((u8)((*destPixels & 0xF0) - (FIRST_SPOT_COLOR << 4))\
-                                 <= ((LAST_SPOT_COLOR - FIRST_SPOT_COLOR) << 4))\
-                            *destPixels += (SPOT_COLOR_ADJUSTMENT << 4);        \
+                        TRY_DRAW_SPOT_PIXEL(destPixels, 4);                     \
                     }                                                           \
                     else                                                        \
                     {                                                           \
-                        /* Draw spot pixel if this is Spinda's body color */    \
-                        if ((u8)((*destPixels & 0xF) - FIRST_SPOT_COLOR)        \
-                                 <= (LAST_SPOT_COLOR - FIRST_SPOT_COLOR))       \
-                            *destPixels += SPOT_COLOR_ADJUSTMENT;               \
+                        TRY_DRAW_SPOT_PIXEL(destPixels, 0);                     \
                     }                                                           \
                 }                                                               \
                                                                                 \
@@ -7114,6 +7123,7 @@ u8 GetMoveRelearnerMoves(struct Pokemon *mon, u16 *moves)
     u8 numMoves = 0;
     u16 species = GetMonData(mon, MON_DATA_SPECIES, 0);
     u8 level = GetMonData(mon, MON_DATA_LEVEL, 0);
+    bool32 wasBaby = GetMonData(mon, MON_DATA_MET_LEVEL, 0) == 0;
     int i, j, k;
 
     for (i = 0; i < MAX_MON_MOVES; i++)
@@ -7130,6 +7140,9 @@ u8 GetMoveRelearnerMoves(struct Pokemon *mon, u16 *moves)
 
         if (moveLevel <= (level << 9))
         {
+            if ((gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_BABY) && !wasBaby)
+                break;
+
             for (j = 0; j < MAX_MON_MOVES && learnedMoves[j] != (gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_ID); j++)
                 ;
 
@@ -7165,6 +7178,7 @@ u8 GetNumberOfRelearnableMoves(struct Pokemon *mon)
     u8 numMoves = 0;
     u16 species = GetMonData(mon, MON_DATA_SPECIES_OR_EGG, 0);
     u8 level = GetMonData(mon, MON_DATA_LEVEL, 0);
+    bool32 wasBaby = GetMonData(mon, MON_DATA_MET_LEVEL, 0) == 0;
     int i, j, k;
 
     if (species == SPECIES_EGG)
@@ -7184,6 +7198,9 @@ u8 GetNumberOfRelearnableMoves(struct Pokemon *mon)
 
         if (moveLevel <= (level << 9))
         {
+            if ((gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_BABY) && !wasBaby)
+                break;
+
             for (j = 0; j < MAX_MON_MOVES && learnedMoves[j] != (gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_ID); j++)
                 ;
 
@@ -7263,6 +7280,7 @@ u16 GetBattleBGM(void)
         case TRAINER_CLASS_LEADER:
             return MUS_VS_GYM_LEADER;
         case TRAINER_CLASS_CHAMPION:
+        case TRAINER_CLASS_CHAMPION_2:
             return MUS_VS_CHAMPION;
         case TRAINER_CLASS_RIVAL:
             if (gBattleTypeFlags & BATTLE_TYPE_FRONTIER)
@@ -7291,10 +7309,10 @@ u16 GetBattleBGM(void)
 
 		if (IsMonFireRedExclusive(species) || IsMonLeafGreenExclusive(species) || IsMonFireRedLeafGreenExclusive(species))
 			track = MUS_RG_VS_WILD;
-		
+
 		if (GetCurrentRegionMapSectionId() != MAPSEC_SAFARI_ZONE && (IsMonOutsideSafariFireRed(species) || IsMonOutsideSafariLeafGreen(species) || IsMonOutsideSafariFireRedLeafGreen(species)))
 			track = MUS_RG_VS_WILD;
-		
+
         return track;
 	}
 }
@@ -7523,7 +7541,7 @@ void SetWildMonHeldItem(void)
             chanceNoItem = 20;
             chanceNotRare = 80;
         }
-		
+
 		if (gPowerType == POWER_ITEM && gPowerTime > 0)
 		{
 			switch (gPowerLevel)
@@ -7581,7 +7599,7 @@ void SetWildMonHeldItem(void)
                     SetMonData(&gEnemyParty[0], MON_DATA_HELD_ITEM, &gSpeciesInfo[species].itemRare);
             }
         }
-		
+
 		if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE && !(gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_TRAINER)))
 		{
 			rnd = Random() % 100;
@@ -7646,7 +7664,7 @@ bool8 IsMonSquareShiny(struct Pokemon *mon)
 {
 	u32 otId = GetMonData(mon, MON_DATA_OT_ID, 0);
 	u32 personality = GetMonData(mon, MON_DATA_PERSONALITY, 0);
-	
+
 	if ((HIHALF(otId) ^ LOHALF(otId) ^ HIHALF(personality) ^ LOHALF(personality)) == 0)
 		return TRUE;
 	else if (GetMonData(mon, MON_DATA_MODERN_FATEFUL_ENCOUNTER, 0) && (HIHALF(otId) ^ LOHALF(otId) ^ HIHALF(personality) ^ LOHALF(personality)) < SHINY_ODDS)
@@ -8163,7 +8181,7 @@ u8 GivePorygon(void)
 	u16 item;
 	u16 checksum;
 	u8 encounterType;
-	
+
 	personality = 0xC8693992u;
 	ivs[0] = 31;
 	ivs[1] = 31;
@@ -8301,15 +8319,15 @@ void RespawnAllLegendaries(void)
 		FlagClear(FLAG_DEFEATED_RAYQUAZA);
 		FlagClear(FLAG_DEFEATED_SUDOWOODO);
 		FlagClear(FLAG_DEFEATED_MEWTWO);
-		
+
 		FlagClear(FLAG_CAUGHT_MEW);
 		FlagClear(FLAG_CAUGHT_LUGIA);
 		FlagClear(FLAG_CAUGHT_HO_OH);
-		
+
 		FlagClear(FLAG_BATTLED_DEOXYS);
-		
+
 		FlagClear(FLAG_HIDDEN_ITEM_NAVEL_ROCK_TOP_SACRED_ASH);
-		
+
 		if (FlagGet(FLAG_CAUGHT_LATIAS_OR_LATIOS) && VarGet(VAR_ROAMER_POKEMON) >= 4)
 		{
 			if (FlagGet(FLAG_ROAMER_QUEST) && roamer->species != SPECIES_LATIAS)
